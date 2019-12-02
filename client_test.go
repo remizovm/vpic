@@ -3,9 +3,21 @@ package vpic
 import (
 	"context"
 	"testing"
+	"time"
 
 	. "github.com/smartystreets/goconvey/convey"
 )
+
+func TestGetParts(t *testing.T) {
+	Convey("GetParts method", t, func() {
+		c := Client{}
+		dtFrom := time.Date(2015, time.January, 1, 0, 0, 0, 0, time.UTC)
+		dtTo := time.Date(2015, time.May, 5, 0, 0, 0, 0, time.UTC)
+		resp, err := c.GetParts(context.Background(), 565, dtFrom, dtTo, 0)
+		So(err, ShouldBeNil)
+		So(resp, ShouldNotBeEmpty)
+	})
+}
 
 func TestMakesByVehicleTypeName(t *testing.T) {
 	Convey("MakesByVehicleTypeName method", t, func() {

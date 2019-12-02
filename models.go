@@ -1,5 +1,17 @@
 package vpic
 
+type Part struct {
+	CoverLetterURL   string `json:"CoverLetterURL"`
+	LetterDate       string `json:"LetterDate"`
+	ManufacturerID   int64  `json:"ManufacturerId"`
+	ManufacturerName string `json:"ManufacturerName"`
+	ModelYearFrom    string `json:"ModelYearFrom"`
+	ModelYearTo      string `json:"ModelYearTo"`
+	Name             string `json:"Name"`
+	Type             string `json:"Type"`
+	URL              string `json:"URL"`
+}
+
 type Model struct {
 	MakeID    int64  `json:"Make_ID"`
 	MakeName  string `json:"Make_Name"`

@@ -4,7 +4,9 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"net/url"
 	"strconv"
+	"time"
 )
 
 const (
@@ -13,6 +15,41 @@ const (
 
 type Client struct {
 	HTTPClient http.Client
+}
+
+func (c Client) GetParts(ctx context.Context, partType int64, dtFrom, dtTo time.Time, page int) ([]Part, error) {
+	values := url.Values{}
+	values.Set("format", "json")
+	values.Set("type", strconv.FormatInt(partType, 10))
+	values.Set("fromDate", dtFrom.Format("1/2/2006"))
+	values.Set("toDate", dtTo.Format("1/2/2006"))
+	if page != 0 {
+		values.Set("page", strconv.Itoa(page))
+	}
+	uri := endpoint + "/vehicles/GetParts?" + values.Encode()
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, uri, nil)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Add("content-type", "application/json")
+	resp, err := c.HTTPClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var result struct {
+		Count          int    `json:"count"`
+		Message        string `json:"message"`
+		SearchCriteria string `json:"SearchCriteria"`
+		Results        []Part `json:"Results"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		return nil, err
+	}
+
+	return result.Results, nil
 }
 
 func (c Client) MakesByVehicleTypeName(ctx context.Context, name string) ([]Make, error) {
