@@ -1,5 +1,12 @@
 package vpic
 
+type Spec struct {
+	Data []struct {
+		Name   string `json:"Name"`
+		Values string `json:"Value"`
+	} `json:"Specs"`
+}
+
 type EquipmentPlantCode struct {
 	Name          string `json:"Name"`
 	Address       string `json:"Address"`
