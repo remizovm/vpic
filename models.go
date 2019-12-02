@@ -1,5 +1,43 @@
 package vpic
 
+type EquipmentItem struct{}
+
+type ManufacturerType struct{}
+
+type VehicleType struct {
+	MakeID   int64  `json:"MakeId"`
+	MakeName string `json:"MakeName"`
+	ID       int64  `json:"VehicleTypeId"`
+	Name     string `json:"VehicleTypeName"`
+}
+
+type Manufacturer struct {
+	Address            string             `json:"Address"`
+	Address2           string             `json:"Address2"`
+	City               string             `json:"City"`
+	Email              string             `json:"ContactEmail"`
+	Fax                string             `json:"ContactFax"`
+	Phone              string             `json:"ContactPhone"`
+	Country            string             `json:"Country"`
+	EquipmentItems     []EquipmentItem    `json:"EquipmentItems"`
+	LastUpdated        string             `json:"LastUpdated"`
+	ManufacturerTypes  []ManufacturerType `json:"ManufacturerTypes"`
+	CommonName         string             `json:"Mfr_CommonName"`
+	ID                 int64              `json:"Mfr_ID"`
+	Name               string             `json:"Mfr_Name"`
+	Other              string             `json:"OtherManufacturerDetails"`
+	PostalCode         string             `json:"PostalCode"`
+	PrimaryProduct     string             `json:"PrimaryProduct"`
+	PrincipalFirstName string             `json:"PrincipalFirstName"`
+	PrincipalLastName  string             `json:"PrincipalLastName"`
+	PrincipalPosition  string             `json:"PrincipalPosition"`
+	StateProvince      string             `json:"StateProvince"`
+	SubmittedName      string             `json:"SubmittedName"`
+	SubmittedOn        string             `json:"SubmittedOn"`
+	SubmittedPosition  string             `json:"SubmittedPosition"`
+	VehicleTypes       []VehicleType      `json:"VehicleTypes"`
+}
+
 type Make struct {
 	ID   int64  `json:"Make_ID"`
 	Name string `json:"Make_Name"`
