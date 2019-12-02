@@ -8,6 +8,15 @@ import (
 	. "github.com/smartystreets/goconvey/convey"
 )
 
+func TestManufacturers(t *testing.T) {
+	Convey("Manufacturers method", t, func() {
+		c := Client{}
+		resp, err := c.Manufacturers(context.Background(), "", 0)
+		So(err, ShouldBeNil)
+		So(resp, ShouldNotBeEmpty)
+	})
+}
+
 func TestGetParts(t *testing.T) {
 	Convey("GetParts method", t, func() {
 		c := Client{}

@@ -17,6 +17,41 @@ type Client struct {
 	HTTPClient http.Client
 }
 
+func (c Client) Manufacturers(ctx context.Context, mType string, page int) ([]Manufacturer, error) {
+	values := url.Values{}
+	values.Set("format", "json")
+	if mType != "" {
+		values.Set("ManufacturerType", mType)
+	}
+	if page != 0 {
+		values.Set("page", strconv.Itoa(page))
+	}
+	uri := endpoint + "/vehicles/GetAllManufacturers?" + values.Encode()
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, uri, nil)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Add("content-type", "application/json")
+	resp, err := c.HTTPClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var result struct {
+		Count          int            `json:"count"`
+		Message        string         `json:"message"`
+		SearchCriteria string         `json:"SearchCriteria"`
+		Results        []Manufacturer `json:"Results"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		return nil, err
+	}
+
+	return result.Results, nil
+}
+
 func (c Client) GetParts(ctx context.Context, partType int64, dtFrom, dtTo time.Time, page int) ([]Part, error) {
 	values := url.Values{}
 	values.Set("format", "json")
