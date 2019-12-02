@@ -15,6 +15,32 @@ type Client struct {
 	HTTPClient http.Client
 }
 
+func (c Client) Makes(ctx context.Context) ([]Make, error) {
+	url := endpoint + "/vehicles/getallmakes?format=json"
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Add("content-type", "application/json")
+	resp, err := c.HTTPClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var result struct {
+		Count          int    `json:"count"`
+		Message        string `json:"message"`
+		SearchCriteria string `json:"SearchCriteria"`
+		Results        []Make `json:"Results"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		return nil, err
+	}
+
+	return result.Results, nil
+}
+
 func (c Client) GetWMIList(ctx context.Context, manufacturer string) ([]WMI, error) {
 	url := endpoint + "/vehicles/GetWMIsForManufacturer/" + manufacturer + "?format=json"
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)

@@ -7,6 +7,15 @@ import (
 	. "github.com/smartystreets/goconvey/convey"
 )
 
+func TestMakes(t *testing.T) {
+	Convey("Makes method", t, func() {
+		c := Client{}
+		resp, err := c.Makes(context.Background())
+		So(err, ShouldBeNil)
+		So(resp, ShouldNotBeEmpty)
+	})
+}
+
 func TestGetWMIList(t *testing.T) {
 	Convey("GetWMIList method", t, func() {
 		c := Client{}

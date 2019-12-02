@@ -1,5 +1,10 @@
 package vpic
 
+type Make struct {
+	ID   int64  `json:"Make_ID"`
+	Name string `json:"Make_Name"`
+}
+
 type WMI struct {
 	CanceledDate string `json:"CanceledDate"`
 	CreatedOn    string `json:"CreatedOn"`
