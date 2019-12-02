@@ -3,6 +3,7 @@ package vpic
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -13,8 +14,63 @@ const (
 	endpoint = `https://vpic.nhtsa.dot.gov/api`
 )
 
+type EquipmentType int
+
+const (
+	EquipmentTypeTires      EquipmentType = 1
+	EquipmentTypeBrakeHoses EquipmentType = 3
+	EquipmentTypeGlazing    EquipmentType = 13
+	EquipmentTypeRetread    EquipmentType = 16
+)
+
+type ReportType string
+
+const (
+	ReportTypeNew     ReportType = "New"
+	ReportTypeUpdated ReportType = "Updated"
+	ReportTypeClosed  ReportType = "Closed"
+	ReportTypeAll     ReportType = "All"
+)
+
+var ErrYearInvalid = errors.New("year is below 2016")
+
 type Client struct {
 	HTTPClient http.Client
+}
+
+func (c Client) EquipmentPlantCodes(ctx context.Context, year int, equipmentType EquipmentType, reportType ReportType) ([]EquipmentPlantCode, error) {
+	if year > 2016 {
+		return nil, ErrYearInvalid
+	}
+	values := url.Values{}
+	values.Set("year", strconv.Itoa(year))
+	values.Set("equipmentType", strconv.Itoa(int(equipmentType)))
+	values.Set("reportType", string(reportType))
+	values.Set("format", "json")
+
+	url := endpoint + "/vehicles/GetEquipmentPlantCodes?" + values.Encode()
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Add("content-type", "application/json")
+	resp, err := c.HTTPClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var result struct {
+		Count          int                  `json:"count"`
+		Message        string               `json:"message"`
+		SearchCriteria string               `json:"SearchCriteria"`
+		Results        []EquipmentPlantCode `json:"Results"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		return nil, err
+	}
+
+	return result.Results, nil
 }
 
 func (c Client) MakesByManufacturerNameAndYear(ctx context.Context, name string, year int) ([]Make, error) {

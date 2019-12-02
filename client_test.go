@@ -8,6 +8,15 @@ import (
 	. "github.com/smartystreets/goconvey/convey"
 )
 
+func TestEquipmentPlantCodes(t *testing.T) {
+	Convey("EquipmentPlantCodes method", t, func() {
+		c := Client{}
+		resp, err := c.EquipmentPlantCodes(context.Background(), 2015, EquipmentTypeTires, ReportTypeAll)
+		So(err, ShouldBeNil)
+		So(resp, ShouldNotBeEmpty)
+	})
+}
+
 func TestMakesByManufacturerByYear(t *testing.T) {
 	Convey("MakesByManufacturerByYear", t, func() {
 		Convey("and ByName method", func() {

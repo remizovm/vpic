@@ -1,5 +1,17 @@
 package vpic
 
+type EquipmentPlantCode struct {
+	Name          string `json:"Name"`
+	Address       string `json:"Address"`
+	City          string `json:"City"`
+	Country       string `json:"Country"`
+	DOTCode       string `json:"DOTCode"`
+	OldDOTCode    string `json:"OldDOTCode"`
+	PostalCode    string `json:"PostalCode"`
+	StateProvince string `json:"StateProvince"`
+	Status        string `json:"Status"`
+}
+
 type Part struct {
 	CoverLetterURL   string `json:"CoverLetterURL"`
 	LetterDate       string `json:"LetterDate"`
