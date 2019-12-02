@@ -7,6 +7,15 @@ import (
 	. "github.com/smartystreets/goconvey/convey"
 )
 
+func TestVehicleTypesByMakeID(t *testing.T) {
+	Convey("VehicleTypesByMakeID method", t, func() {
+		c := Client{}
+		resp, err := c.VehicleTypesByMakeID(context.Background(), 450)
+		So(err, ShouldBeNil)
+		So(resp, ShouldNotBeEmpty)
+	})
+}
+
 func TestVehicleTypesByMake(t *testing.T) {
 	Convey("VehicleTypesByMake method", t, func() {
 		c := Client{}
