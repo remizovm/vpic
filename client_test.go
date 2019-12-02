@@ -7,6 +7,23 @@ import (
 	. "github.com/smartystreets/goconvey/convey"
 )
 
+func TestVehicleVarialbeValuesList(t *testing.T) {
+	Convey("VehicleVariableValues", t, func() {
+		Convey("by name", func() {
+			c := Client{}
+			resp, err := c.VehicleVariableValuesListByName(context.Background(), "battery%20type")
+			So(err, ShouldBeNil)
+			So(resp, ShouldNotBeEmpty)
+		})
+		Convey("by id", func() {
+			c := Client{}
+			resp, err := c.VehicleVariableValuesListByID(context.Background(), 2)
+			So(err, ShouldBeNil)
+			So(resp, ShouldNotBeEmpty)
+		})
+	})
+}
+
 func TestDecodeVINExtendedFlat(t *testing.T) {
 	Convey("DecodeVINFlat method", t, func() {
 		c := Client{}
