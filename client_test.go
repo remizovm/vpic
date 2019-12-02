@@ -7,6 +7,15 @@ import (
 	. "github.com/smartystreets/goconvey/convey"
 )
 
+func TestVehicleVariblesList(t *testing.T) {
+	Convey("VehicleVariablesList method", t, func() {
+		c := Client{}
+		resp, err := c.VehicleVariablesList(context.Background())
+		So(err, ShouldBeNil)
+		So(resp, ShouldNotBeEmpty)
+	})
+}
+
 func TestVehicleVarialbeValuesList(t *testing.T) {
 	Convey("VehicleVariableValues", t, func() {
 		Convey("by name", func() {

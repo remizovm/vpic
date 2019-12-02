@@ -15,6 +15,32 @@ type Client struct {
 	HTTPClient http.Client
 }
 
+func (c Client) VehicleVariablesList(ctx context.Context) ([]VehicleVariable, error) {
+	url := endpoint + "/vehicles/getvehiclevariablelist?format=json"
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Add("content-type", "application/json")
+	resp, err := c.HTTPClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var result struct {
+		Count          int               `json:"count"`
+		Message        string            `json:"message"`
+		SearchCriteria string            `json:"SearchCriteria"`
+		Results        []VehicleVariable `json:"Results"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		return nil, err
+	}
+
+	return result.Results, nil
+}
+
 func (c Client) VehicleVariableValuesListByID(ctx context.Context, id int) ([]VehicleVariableValues, error) {
 	url := endpoint + "/vehicles/getvehiclevariablevalueslist/" + strconv.Itoa(id) + "?format=json"
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
