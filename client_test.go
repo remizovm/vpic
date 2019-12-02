@@ -8,6 +8,23 @@ import (
 	. "github.com/smartystreets/goconvey/convey"
 )
 
+func TestMakesByManufacturerByYear(t *testing.T) {
+	Convey("MakesByManufacturerByYear", t, func() {
+		Convey("and ByName method", func() {
+			c := Client{}
+			resp, err := c.MakesByManufacturerNameAndYear(context.Background(), "mer", 2013)
+			So(err, ShouldBeNil)
+			So(resp, ShouldNotBeEmpty)
+		})
+		Convey("and ByID method", func() {
+			c := Client{}
+			resp, err := c.MakesByManufacturerIDAndYear(context.Background(), 988, 2013)
+			So(err, ShouldBeNil)
+			So(resp, ShouldNotBeEmpty)
+		})
+	})
+}
+
 func TestMakesByManufacturer(t *testing.T) {
 	Convey("MakesByManufacturer", t, func() {
 		Convey("ByName method", func() {
