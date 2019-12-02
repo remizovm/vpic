@@ -8,6 +8,24 @@ import (
 	. "github.com/smartystreets/goconvey/convey"
 )
 
+func TestDecodeVINFlatBatch(t *testing.T) {
+	Convey("DecodeVINFlatBatch method", t, func() {
+		c := Client{}
+		req := []*VINBatchRequest{
+			&VINBatchRequest{
+				VIN:  "5UXWX7C5*BA",
+				Year: 2011,
+			},
+			&VINBatchRequest{
+				VIN: "5YJSA3DS*EF",
+			},
+		}
+		resp, err := c.DecodeVINFlatBatch(context.Background(), req)
+		So(err, ShouldBeNil)
+		So(resp, ShouldNotBeEmpty)
+	})
+}
+
 func TestCanadianSpecs(t *testing.T) {
 	Convey("CanadianSpecs method", t, func() {
 		c := Client{}

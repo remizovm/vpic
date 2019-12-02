@@ -1,5 +1,10 @@
 package vpic
 
+type VINBatchRequest struct {
+	VIN  string
+	Year int
+}
+
 type Spec struct {
 	Data []struct {
 		Name   string `json:"Name"`

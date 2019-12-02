@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -43,6 +44,50 @@ var ErrYearInvalid = errors.New("year is invalid")
 
 type Client struct {
 	HTTPClient http.Client
+}
+
+func (c Client) DecodeVINFlatBatch(ctx context.Context, request []*VINBatchRequest) ([]map[string]string, error) {
+	var rawReq []string
+	for _, r := range request {
+		data := r.VIN
+		if r.Year != 0 {
+			data = data + "," + strconv.Itoa(r.Year)
+		}
+		rawReq = append(rawReq, data)
+	}
+	payload := strings.Join(rawReq, ";")
+
+	data := url.Values{}
+	data.Set("data", payload)
+	data.Set("format", "json")
+
+	uri := endpoint + "/vehicles/DecodeVINValuesBatch/"
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, uri, strings.NewReader(data.Encode()))
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	req.Header.Add("Content-Length", strconv.Itoa(len(data.Encode())))
+
+	resp, err := c.HTTPClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var result struct {
+		Count          int                 `json:"count"`
+		Message        string              `json:"message"`
+		SearchCriteria string              `json:"SearchCriteria"`
+		Results        []map[string]string `json:"Results"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		return nil, err
+	}
+
+	return result.Results, nil
+
+	return nil, nil
 }
 
 func (c Client) CanadianVehicleSpecs(ctx context.Context, year int, makeName, model string, units *Units) ([]Spec, error) {
