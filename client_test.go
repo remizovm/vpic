@@ -7,6 +7,15 @@ import (
 	. "github.com/smartystreets/goconvey/convey"
 )
 
+func TestGetWMIList(t *testing.T) {
+	Convey("GetWMIList method", t, func() {
+		c := Client{}
+		resp, err := c.GetWMIList(context.Background(), "hon")
+		So(err, ShouldBeNil)
+		So(resp, ShouldNotBeEmpty)
+	})
+}
+
 func TestDecodeWMI(t *testing.T) {
 	Convey("DecodeWMI method", t, func() {
 		c := Client{}

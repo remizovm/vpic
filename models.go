@@ -1,5 +1,16 @@
 package vpic
 
+type WMI struct {
+	CanceledDate string `json:"CanceledDate"`
+	CreatedOn    string `json:"CreatedOn"`
+	UpdatedOn    string `json:"UpdatedOn"`
+	VehicleType  string `json:"VehicleType"`
+	Country      string `json:"Country"`
+	ID           int    `json:"Id"`
+	Name         string `json:"Name"`
+	WMI          string `json:"WMI"`
+}
+
 type DecodeWMIResult struct {
 	CanceledDate          string `json:"CanceledDate"`
 	CommonName            string `json:"CommonName"`
