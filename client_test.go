@@ -8,6 +8,15 @@ import (
 	. "github.com/smartystreets/goconvey/convey"
 )
 
+func TestModelsByMakeIDAndYearVehicleType(t *testing.T) {
+	Convey("DecodeVINFlatBatch method", t, func() {
+		c := Client{}
+		resp, err := c.ModelsByMakeIDAndYearVehicleType(context.Background(), 2015, 474, "")
+		So(err, ShouldBeNil)
+		So(resp, ShouldNotBeEmpty)
+	})
+}
+
 func TestModelsByMakeAndYearVehicleType(t *testing.T) {
 	Convey("DecodeVINFlatBatch method", t, func() {
 		c := Client{}

@@ -49,6 +49,47 @@ type Client struct {
 	HTTPClient http.Client
 }
 
+func (c Client) ModelsByMakeIDAndYearVehicleType(ctx context.Context, year int, id int64, vehicleType string) ([]Model, error) {
+	if year < 1995 {
+		return nil, ErrYearInvalid
+	}
+	var uri string
+	switch {
+	case year != 0 && vehicleType != "":
+		uri = endpoint + "/vehicles/GetModelsForMakeIdYear/makeId/" + strconv.FormatInt(id, 10) + "/modelyear/" + strconv.Itoa(year) + "/vehicletype/" + vehicleType + "?format=json"
+	case year != 0 && vehicleType == "":
+		uri = endpoint + "/vehicles/GetModelsForMakeIdYear/makeId/" + strconv.FormatInt(id, 10) + "/modelyear/" + strconv.Itoa(year) + "?format=json"
+	case year == 0 && vehicleType != "":
+		uri = endpoint + "/vehicles/GetModelsForMakeIdYear/makeId/" + strconv.FormatInt(id, 10) + "/vehicletype/" + vehicleType + "?format=json"
+	default:
+		return nil, ErrArgsInvalid
+	}
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, uri, nil)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Add("Content-Type", "application/json")
+
+	resp, err := c.HTTPClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var result struct {
+		Count          int     `json:"count"`
+		Message        string  `json:"message"`
+		SearchCriteria string  `json:"SearchCriteria"`
+		Results        []Model `json:"Results"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		return nil, err
+	}
+
+	return result.Results, nil
+}
+
 func (c Client) ModelsByMakeAndYearVehicleType(ctx context.Context, year int, makeName, vehicleType string) ([]Model, error) {
 	if year < 1995 {
 		return nil, ErrYearInvalid
