@@ -1,5 +1,18 @@
 package vpic
 
+type DecodeWMIResult struct {
+	CanceledDate          string `json:"CanceledDate"`
+	CommonName            string `json:"CommonName"`
+	CreatedOn             string `json:"CreatedOn"`
+	DateAvailableToPublic string `json:"DateAvailableToPublic"`
+	Make                  string `json:"Make"`
+	ManufacturerName      string `json:"ManufacturerName"`
+	ParentCompanyName     string `json:"ParentCompanyName"`
+	URL                   string `json:"URL"`
+	UpdatedOn             string `json:"UpdatedOn"`
+	VehicleType           string `json:"VehicleType"`
+}
+
 type VehicleVariable struct {
 	Name        string `json:"Name"`
 	DataType    string `json:"DataType"`
