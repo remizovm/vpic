@@ -79,7 +79,7 @@ func (c Client) ModelsByMakeIDAndYearVehicleType(ctx context.Context, year int, 
 
 	var result struct {
 		Count          int     `json:"Count"`
-		Message        string  `json:"message"`
+		Message        string  `json:"Message"`
 		SearchCriteria string  `json:"SearchCriteria"`
 		Results        []Model `json:"Results"`
 	}
@@ -120,7 +120,7 @@ func (c Client) ModelsByMakeAndYearVehicleType(ctx context.Context, year int, ma
 
 	var result struct {
 		Count          int     `json:"Count"`
-		Message        string  `json:"message"`
+		Message        string  `json:"Message"`
 		SearchCriteria string  `json:"SearchCriteria"`
 		Results        []Model `json:"Results"`
 	}
@@ -162,7 +162,7 @@ func (c Client) DecodeVINFlatBatch(ctx context.Context, request []*VINBatchReque
 
 	var result struct {
 		Count          int                 `json:"Count"`
-		Message        string              `json:"message"`
+		Message        string              `json:"Message"`
 		SearchCriteria string              `json:"SearchCriteria"`
 		Results        []map[string]string `json:"Results"`
 	}
@@ -203,7 +203,7 @@ func (c Client) CanadianVehicleSpecs(ctx context.Context, year int, makeName, mo
 
 	var result struct {
 		Count          int    `json:"Count"`
-		Message        string `json:"message"`
+		Message        string `json:"Message"`
 		SearchCriteria string `json:"SearchCriteria"`
 		Results        []Spec `json:"Results"`
 	}
@@ -238,7 +238,7 @@ func (c Client) EquipmentPlantCodes(ctx context.Context, year int, equipmentType
 
 	var result struct {
 		Count          int                  `json:"Count"`
-		Message        string               `json:"message"`
+		Message        string               `json:"Message"`
 		SearchCriteria string               `json:"SearchCriteria"`
 		Results        []EquipmentPlantCode `json:"Results"`
 	}
@@ -268,7 +268,7 @@ func (c Client) MakesByManufacturerNameAndYear(ctx context.Context, name string,
 
 	var result struct {
 		Count          int    `json:"Count"`
-		Message        string `json:"message"`
+		Message        string `json:"Message"`
 		SearchCriteria string `json:"SearchCriteria"`
 		Results        []Make `json:"Results"`
 	}
@@ -298,7 +298,7 @@ func (c Client) MakesByManufacturerIDAndYear(ctx context.Context, id int64, year
 
 	var result struct {
 		Count          int    `json:"Count"`
-		Message        string `json:"message"`
+		Message        string `json:"Message"`
 		SearchCriteria string `json:"SearchCriteria"`
 		Results        []Make `json:"Results"`
 	}
@@ -324,7 +324,7 @@ func (c Client) MakesByManufacturerID(ctx context.Context, id int64) ([]Make, er
 
 	var result struct {
 		Count          int    `json:"Count"`
-		Message        string `json:"message"`
+		Message        string `json:"Message"`
 		SearchCriteria string `json:"SearchCriteria"`
 		Results        []Make `json:"Results"`
 	}
@@ -350,7 +350,7 @@ func (c Client) MakesByManufacturerName(ctx context.Context, name string) ([]Mak
 
 	var result struct {
 		Count          int    `json:"Count"`
-		Message        string `json:"message"`
+		Message        string `json:"Message"`
 		SearchCriteria string `json:"SearchCriteria"`
 		Results        []Make `json:"Results"`
 	}
@@ -385,7 +385,7 @@ func (c Client) Manufacturers(ctx context.Context, mType string, page int) ([]Ma
 
 	var result struct {
 		Count          int            `json:"Count"`
-		Message        string         `json:"message"`
+		Message        string         `json:"Message"`
 		SearchCriteria string         `json:"SearchCriteria"`
 		Results        []Manufacturer `json:"Results"`
 	}
@@ -420,7 +420,7 @@ func (c Client) GetParts(ctx context.Context, partType int64, dtFrom, dtTo time.
 
 	var result struct {
 		Count          int    `json:"Count"`
-		Message        string `json:"message"`
+		Message        string `json:"Message"`
 		SearchCriteria string `json:"SearchCriteria"`
 		Results        []Part `json:"Results"`
 	}
@@ -446,7 +446,7 @@ func (c Client) MakesByVehicleTypeName(ctx context.Context, name string) ([]Make
 
 	var result struct {
 		Count          int    `json:"Count"`
-		Message        string `json:"message"`
+		Message        string `json:"Message"`
 		SearchCriteria string `json:"SearchCriteria"`
 		Results        []Make `json:"Results"`
 	}
@@ -472,7 +472,7 @@ func (c Client) VehicleTypesByMakeID(ctx context.Context, id int64) ([]VehicleTy
 
 	var result struct {
 		Count          int           `json:"Count"`
-		Message        string        `json:"message"`
+		Message        string        `json:"Message"`
 		SearchCriteria string        `json:"SearchCriteria"`
 		Results        []VehicleType `json:"Results"`
 	}
@@ -498,7 +498,7 @@ func (c Client) VehicleTypesByMake(ctx context.Context, name string) ([]VehicleT
 
 	var result struct {
 		Count          int           `json:"Count"`
-		Message        string        `json:"message"`
+		Message        string        `json:"Message"`
 		SearchCriteria string        `json:"SearchCriteria"`
 		Results        []VehicleType `json:"Results"`
 	}
@@ -524,7 +524,7 @@ func (c Client) ModelsByMake(ctx context.Context, name string) ([]Model, error) 
 
 	var result struct {
 		Count          int     `json:"Count"`
-		Message        string  `json:"message"`
+		Message        string  `json:"Message"`
 		SearchCriteria string  `json:"SearchCriteria"`
 		Results        []Model `json:"Results"`
 	}
@@ -550,7 +550,7 @@ func (c Client) ModelsByMakeID(ctx context.Context, id int64) ([]Model, error) {
 
 	var result struct {
 		Count          int     `json:"Count"`
-		Message        string  `json:"message"`
+		Message        string  `json:"Message"`
 		SearchCriteria string  `json:"SearchCriteria"`
 		Results        []Model `json:"Results"`
 	}
@@ -576,7 +576,7 @@ func (c Client) ManufacturerDetailsByID(ctx context.Context, id int64) ([]Manufa
 
 	var result struct {
 		Count          int            `json:"Count"`
-		Message        string         `json:"message"`
+		Message        string         `json:"Message"`
 		SearchCriteria string         `json:"SearchCriteria"`
 		Results        []Manufacturer `json:"Results"`
 	}
@@ -602,7 +602,7 @@ func (c Client) ManufacturerDetailsByName(ctx context.Context, name string) ([]M
 
 	var result struct {
 		Count          int            `json:"Count"`
-		Message        string         `json:"message"`
+		Message        string         `json:"Message"`
 		SearchCriteria string         `json:"SearchCriteria"`
 		Results        []Manufacturer `json:"Results"`
 	}
@@ -628,7 +628,7 @@ func (c Client) Makes(ctx context.Context) ([]Make, error) {
 
 	var result struct {
 		Count          int    `json:"Count"`
-		Message        string `json:"message"`
+		Message        string `json:"Message"`
 		SearchCriteria string `json:"SearchCriteria"`
 		Results        []Make `json:"Results"`
 	}
@@ -654,7 +654,7 @@ func (c Client) GetWMIList(ctx context.Context, manufacturer string) ([]WMI, err
 
 	var result struct {
 		Count          int    `json:"Count"`
-		Message        string `json:"message"`
+		Message        string `json:"Message"`
 		SearchCriteria string `json:"SearchCriteria"`
 		Results        []WMI  `json:"Results"`
 	}
@@ -680,7 +680,7 @@ func (c Client) DecodeWMI(ctx context.Context, wmi string) ([]DecodeWMIResult, e
 
 	var result struct {
 		Count          int               `json:"Count"`
-		Message        string            `json:"message"`
+		Message        string            `json:"Message"`
 		SearchCriteria string            `json:"SearchCriteria"`
 		Results        []DecodeWMIResult `json:"Results"`
 	}
@@ -706,7 +706,7 @@ func (c Client) VehicleVariablesList(ctx context.Context) ([]VehicleVariable, er
 
 	var result struct {
 		Count          int               `json:"Count"`
-		Message        string            `json:"message"`
+		Message        string            `json:"Message"`
 		SearchCriteria string            `json:"SearchCriteria"`
 		Results        []VehicleVariable `json:"Results"`
 	}
@@ -732,7 +732,7 @@ func (c Client) VehicleVariableValuesListByID(ctx context.Context, id int) ([]Ve
 
 	var result struct {
 		Count          int                     `json:"Count"`
-		Message        string                  `json:"message"`
+		Message        string                  `json:"Message"`
 		SearchCriteria string                  `json:"SearchCriteria"`
 		Results        []VehicleVariableValues `json:"Results"`
 	}
@@ -758,7 +758,7 @@ func (c Client) VehicleVariableValuesListByName(ctx context.Context, name string
 
 	var result struct {
 		Count          int                     `json:"Count"`
-		Message        string                  `json:"message"`
+		Message        string                  `json:"Message"`
 		SearchCriteria string                  `json:"SearchCriteria"`
 		Results        []VehicleVariableValues `json:"Results"`
 	}
@@ -789,7 +789,7 @@ func (c Client) DecodeVINExtendedFlat(ctx context.Context, vin string, modelyear
 
 	var result struct {
 		Count          int                 `json:"Count"`
-		Message        string              `json:"message"`
+		Message        string              `json:"Message"`
 		SearchCriteria string              `json:"SearchCriteria"`
 		Results        []map[string]string `json:"Results"`
 	}
@@ -820,7 +820,7 @@ func (c Client) DecodeVINExtended(ctx context.Context, vin string, modelyear int
 
 	var result struct {
 		Count          int               `json:"Count"`
-		Message        string            `json:"message"`
+		Message        string            `json:"Message"`
 		SearchCriteria string            `json:"SearchCriteria"`
 		Results        []DecodeVINResult `json:"Results"`
 	}
@@ -851,7 +851,7 @@ func (c Client) DecodeVINFlat(ctx context.Context, vin string, modelyear int) (m
 
 	var result struct {
 		Count          int                 `json:"Count"`
-		Message        string              `json:"message"`
+		Message        string              `json:"Message"`
 		SearchCriteria string              `json:"SearchCriteria"`
 		Results        []map[string]string `json:"Results"`
 	}
@@ -882,7 +882,7 @@ func (c Client) DecodeVIN(ctx context.Context, vin string, modelyear int) ([]Dec
 
 	var result struct {
 		Count          int               `json:"Count"`
-		Message        string            `json:"message"`
+		Message        string            `json:"Message"`
 		SearchCriteria string            `json:"SearchCriteria"`
 		Results        []DecodeVINResult `json:"Results"`
 	}
