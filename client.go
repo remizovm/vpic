@@ -50,7 +50,7 @@ type Client struct {
 }
 
 func (c Client) ModelsByMakeIDAndYearVehicleType(ctx context.Context, year int, id int64, vehicleType string) ([]Model, error) {
-	if year < 1995 {
+	if year < 1995 && year != 0 {
 		return nil, ErrYearInvalid
 	}
 	var uri string
@@ -91,7 +91,7 @@ func (c Client) ModelsByMakeIDAndYearVehicleType(ctx context.Context, year int, 
 }
 
 func (c Client) ModelsByMakeAndYearVehicleType(ctx context.Context, year int, makeName, vehicleType string) ([]Model, error) {
-	if year < 1995 {
+	if year < 1995 && year != 0 {
 		return nil, ErrYearInvalid
 	}
 	var uri string

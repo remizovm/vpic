@@ -9,20 +9,48 @@ import (
 )
 
 func TestModelsByMakeIDAndYearVehicleType(t *testing.T) {
-	Convey("DecodeVINFlatBatch method", t, func() {
-		c := Client{}
-		resp, err := c.ModelsByMakeIDAndYearVehicleType(context.Background(), 2015, 474, "")
-		So(err, ShouldBeNil)
-		So(resp, ShouldNotBeEmpty)
+	Convey("ModelsByMakeIDAndYearVehicleType method", t, func() {
+		Convey("should return "+ErrArgsInvalid.Error(), func() {
+			c := Client{}
+			resp, err := c.ModelsByMakeIDAndYearVehicleType(context.Background(), 0, 474, "")
+			So(err, ShouldEqual, ErrArgsInvalid)
+			So(resp, ShouldBeNil)
+		})
+		Convey("should return "+ErrYearInvalid.Error(), func() {
+			c := Client{}
+			resp, err := c.ModelsByMakeIDAndYearVehicleType(context.Background(), 1994, 474, "")
+			So(err, ShouldEqual, ErrYearInvalid)
+			So(resp, ShouldBeNil)
+		})
+		Convey("should work properly in normal case", func() {
+			c := Client{}
+			resp, err := c.ModelsByMakeIDAndYearVehicleType(context.Background(), 2015, 474, "")
+			So(err, ShouldBeNil)
+			So(resp, ShouldNotBeEmpty)
+		})
 	})
 }
 
 func TestModelsByMakeAndYearVehicleType(t *testing.T) {
-	Convey("DecodeVINFlatBatch method", t, func() {
-		c := Client{}
-		resp, err := c.ModelsByMakeAndYearVehicleType(context.Background(), 2015, "honda", "")
-		So(err, ShouldBeNil)
-		So(resp, ShouldNotBeEmpty)
+	Convey("ModelsByMakeAndYearVehicleType method", t, func() {
+		Convey("Should return "+ErrArgsInvalid.Error(), func() {
+			c := Client{}
+			resp, err := c.ModelsByMakeAndYearVehicleType(context.Background(), 0, "honda", "")
+			So(err, ShouldEqual, ErrArgsInvalid)
+			So(resp, ShouldBeNil)
+		})
+		Convey("Should return "+ErrYearInvalid.Error(), func() {
+			c := Client{}
+			resp, err := c.ModelsByMakeAndYearVehicleType(context.Background(), 1994, "honda", "")
+			So(err, ShouldEqual, ErrYearInvalid)
+			So(resp, ShouldBeNil)
+		})
+		Convey("should work properly in normal case", func() {
+			c := Client{}
+			resp, err := c.ModelsByMakeAndYearVehicleType(context.Background(), 2015, "honda", "")
+			So(err, ShouldBeNil)
+			So(resp, ShouldNotBeEmpty)
+		})
 	})
 }
 
@@ -46,19 +74,35 @@ func TestDecodeVINFlatBatch(t *testing.T) {
 
 func TestCanadianSpecs(t *testing.T) {
 	Convey("CanadianSpecs method", t, func() {
-		c := Client{}
-		resp, err := c.CanadianVehicleSpecs(context.Background(), 2011, "Acura", "", nil)
-		So(err, ShouldBeNil)
-		So(resp, ShouldNotBeEmpty)
+		Convey("should return "+ErrYearInvalid.Error(), func() {
+			c := Client{}
+			resp, err := c.CanadianVehicleSpecs(context.Background(), 1960, "Acura", "", nil)
+			So(err, ShouldEqual, ErrYearInvalid)
+			So(resp, ShouldBeNil)
+		})
+		Convey("should work properly in normal case", func() {
+			c := Client{}
+			resp, err := c.CanadianVehicleSpecs(context.Background(), 2011, "Acura", "", nil)
+			So(err, ShouldBeNil)
+			So(resp, ShouldNotBeEmpty)
+		})
 	})
 }
 
 func TestEquipmentPlantCodes(t *testing.T) {
 	Convey("EquipmentPlantCodes method", t, func() {
-		c := Client{}
-		resp, err := c.EquipmentPlantCodes(context.Background(), 2015, EquipmentTypeTires, ReportTypeAll)
-		So(err, ShouldBeNil)
-		So(resp, ShouldNotBeEmpty)
+		Convey("should return "+ErrYearInvalid.Error(), func() {
+			c := Client{}
+			resp, err := c.EquipmentPlantCodes(context.Background(), 2017, EquipmentTypeTires, ReportTypeAll)
+			So(err, ShouldEqual, ErrYearInvalid)
+			So(resp, ShouldBeNil)
+		})
+		Convey("should work properly in normal case", func() {
+			c := Client{}
+			resp, err := c.EquipmentPlantCodes(context.Background(), 2015, EquipmentTypeTires, ReportTypeAll)
+			So(err, ShouldBeNil)
+			So(resp, ShouldNotBeEmpty)
+		})
 	})
 }
 
