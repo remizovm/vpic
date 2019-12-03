@@ -49,6 +49,26 @@ type Client struct {
 	HTTPClient http.Client
 }
 
+func (c Client) doReq(ctx context.Context, uri string, out interface{}) error {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, uri, nil)
+	if err != nil {
+		return err
+	}
+	req.Header.Add("Content-Type", "application/json")
+
+	resp, err := c.HTTPClient.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if err := json.NewDecoder(resp.Body).Decode(&out); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (c Client) ModelsByMakeIDAndYearVehicleType(ctx context.Context, year int, id int64, vehicleType string) ([]Model, error) {
 	if year < 1995 && year != 0 {
 		return nil, ErrYearInvalid
@@ -65,25 +85,14 @@ func (c Client) ModelsByMakeIDAndYearVehicleType(ctx context.Context, year int, 
 		return nil, ErrArgsInvalid
 	}
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, uri, nil)
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Add("Content-Type", "application/json")
-
-	resp, err := c.HTTPClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
 	var result struct {
 		Count          int     `json:"Count"`
 		Message        string  `json:"Message"`
 		SearchCriteria string  `json:"SearchCriteria"`
 		Results        []Model `json:"Results"`
 	}
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+
+	if err := c.doReq(ctx, uri, &result); err != nil {
 		return nil, err
 	}
 
@@ -106,25 +115,14 @@ func (c Client) ModelsByMakeAndYearVehicleType(ctx context.Context, year int, ma
 		return nil, ErrArgsInvalid
 	}
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, uri, nil)
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Add("Content-Type", "application/json")
-
-	resp, err := c.HTTPClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
 	var result struct {
 		Count          int     `json:"Count"`
 		Message        string  `json:"Message"`
 		SearchCriteria string  `json:"SearchCriteria"`
 		Results        []Model `json:"Results"`
 	}
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+
+	if err := c.doReq(ctx, uri, &result); err != nil {
 		return nil, err
 	}
 
@@ -171,8 +169,6 @@ func (c Client) DecodeVINFlatBatch(ctx context.Context, request []*VINBatchReque
 	}
 
 	return result.Results, nil
-
-	return nil, nil
 }
 
 func (c Client) CanadianVehicleSpecs(ctx context.Context, year int, makeName, model string, units *Units) ([]Spec, error) {
@@ -189,17 +185,7 @@ func (c Client) CanadianVehicleSpecs(ctx context.Context, year int, makeName, mo
 	}
 	values.Set("format", "json")
 
-	url := endpoint + "/vehicles/GetCanadianVehicleSpecifications/?" + values.Encode()
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Add("content-type", "application/json")
-	resp, err := c.HTTPClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
+	uri := endpoint + "/vehicles/GetCanadianVehicleSpecifications/?" + values.Encode()
 
 	var result struct {
 		Count          int    `json:"Count"`
@@ -207,7 +193,8 @@ func (c Client) CanadianVehicleSpecs(ctx context.Context, year int, makeName, mo
 		SearchCriteria string `json:"SearchCriteria"`
 		Results        []Spec `json:"Results"`
 	}
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+
+	if err := c.doReq(ctx, uri, &result); err != nil {
 		return nil, err
 	}
 
@@ -224,17 +211,7 @@ func (c Client) EquipmentPlantCodes(ctx context.Context, year int, equipmentType
 	values.Set("reportType", string(reportType))
 	values.Set("format", "json")
 
-	url := endpoint + "/vehicles/GetEquipmentPlantCodes?" + values.Encode()
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Add("content-type", "application/json")
-	resp, err := c.HTTPClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
+	uri := endpoint + "/vehicles/GetEquipmentPlantCodes?" + values.Encode()
 
 	var result struct {
 		Count          int                  `json:"Count"`
@@ -242,7 +219,8 @@ func (c Client) EquipmentPlantCodes(ctx context.Context, year int, equipmentType
 		SearchCriteria string               `json:"SearchCriteria"`
 		Results        []EquipmentPlantCode `json:"Results"`
 	}
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+
+	if err := c.doReq(ctx, uri, &result); err != nil {
 		return nil, err
 	}
 
@@ -254,17 +232,7 @@ func (c Client) MakesByManufacturerNameAndYear(ctx context.Context, name string,
 	values.Set("year", strconv.Itoa(year))
 	values.Set("format", "json")
 
-	url := endpoint + "/vehicles/GetMakesForManufacturerAndYear/" + name + "?" + values.Encode()
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Add("content-type", "application/json")
-	resp, err := c.HTTPClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
+	uri := endpoint + "/vehicles/GetMakesForManufacturerAndYear/" + name + "?" + values.Encode()
 
 	var result struct {
 		Count          int    `json:"Count"`
@@ -272,7 +240,8 @@ func (c Client) MakesByManufacturerNameAndYear(ctx context.Context, name string,
 		SearchCriteria string `json:"SearchCriteria"`
 		Results        []Make `json:"Results"`
 	}
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+
+	if err := c.doReq(ctx, uri, &result); err != nil {
 		return nil, err
 	}
 
@@ -284,17 +253,7 @@ func (c Client) MakesByManufacturerIDAndYear(ctx context.Context, id int64, year
 	values.Set("year", strconv.Itoa(year))
 	values.Set("format", "json")
 
-	url := endpoint + "/vehicles/GetMakesForManufacturerAndYear/" + strconv.FormatInt(id, 10) + "?" + values.Encode()
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Add("content-type", "application/json")
-	resp, err := c.HTTPClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
+	uri := endpoint + "/vehicles/GetMakesForManufacturerAndYear/" + strconv.FormatInt(id, 10) + "?" + values.Encode()
 
 	var result struct {
 		Count          int    `json:"Count"`
@@ -302,7 +261,7 @@ func (c Client) MakesByManufacturerIDAndYear(ctx context.Context, id int64, year
 		SearchCriteria string `json:"SearchCriteria"`
 		Results        []Make `json:"Results"`
 	}
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+	if err := c.doReq(ctx, uri, &result); err != nil {
 		return nil, err
 	}
 
@@ -310,17 +269,7 @@ func (c Client) MakesByManufacturerIDAndYear(ctx context.Context, id int64, year
 }
 
 func (c Client) MakesByManufacturerID(ctx context.Context, id int64) ([]Make, error) {
-	url := endpoint + "/vehicles/GetMakeForManufacturer/" + strconv.FormatInt(id, 10) + "?format=json"
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Add("content-type", "application/json")
-	resp, err := c.HTTPClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
+	uri := endpoint + "/vehicles/GetMakeForManufacturer/" + strconv.FormatInt(id, 10) + "?format=json"
 
 	var result struct {
 		Count          int    `json:"Count"`
@@ -328,7 +277,7 @@ func (c Client) MakesByManufacturerID(ctx context.Context, id int64) ([]Make, er
 		SearchCriteria string `json:"SearchCriteria"`
 		Results        []Make `json:"Results"`
 	}
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+	if err := c.doReq(ctx, uri, &result); err != nil {
 		return nil, err
 	}
 
@@ -336,17 +285,7 @@ func (c Client) MakesByManufacturerID(ctx context.Context, id int64) ([]Make, er
 }
 
 func (c Client) MakesByManufacturerName(ctx context.Context, name string) ([]Make, error) {
-	url := endpoint + "/vehicles/GetMakeForManufacturer/" + name + "?format=json"
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Add("content-type", "application/json")
-	resp, err := c.HTTPClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
+	uri := endpoint + "/vehicles/GetMakeForManufacturer/" + name + "?format=json"
 
 	var result struct {
 		Count          int    `json:"Count"`
@@ -354,7 +293,7 @@ func (c Client) MakesByManufacturerName(ctx context.Context, name string) ([]Mak
 		SearchCriteria string `json:"SearchCriteria"`
 		Results        []Make `json:"Results"`
 	}
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+	if err := c.doReq(ctx, uri, &result); err != nil {
 		return nil, err
 	}
 
@@ -372,24 +311,14 @@ func (c Client) Manufacturers(ctx context.Context, mType string, page int) ([]Ma
 	}
 	uri := endpoint + "/vehicles/GetAllManufacturers?" + values.Encode()
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, uri, nil)
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Add("content-type", "application/json")
-	resp, err := c.HTTPClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
 	var result struct {
 		Count          int            `json:"Count"`
 		Message        string         `json:"Message"`
 		SearchCriteria string         `json:"SearchCriteria"`
 		Results        []Manufacturer `json:"Results"`
 	}
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+
+	if err := c.doReq(ctx, uri, &result); err != nil {
 		return nil, err
 	}
 
@@ -407,24 +336,14 @@ func (c Client) GetParts(ctx context.Context, partType int64, dtFrom, dtTo time.
 	}
 	uri := endpoint + "/vehicles/GetParts?" + values.Encode()
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, uri, nil)
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Add("content-type", "application/json")
-	resp, err := c.HTTPClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
 	var result struct {
 		Count          int    `json:"Count"`
 		Message        string `json:"Message"`
 		SearchCriteria string `json:"SearchCriteria"`
 		Results        []Part `json:"Results"`
 	}
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+
+	if err := c.doReq(ctx, uri, &result); err != nil {
 		return nil, err
 	}
 
@@ -432,17 +351,7 @@ func (c Client) GetParts(ctx context.Context, partType int64, dtFrom, dtTo time.
 }
 
 func (c Client) MakesByVehicleTypeName(ctx context.Context, name string) ([]Make, error) {
-	url := endpoint + "/vehicles/GetMakesForVehicleType/" + name + "?format=json"
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Add("content-type", "application/json")
-	resp, err := c.HTTPClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
+	uri := endpoint + "/vehicles/GetMakesForVehicleType/" + name + "?format=json"
 
 	var result struct {
 		Count          int    `json:"Count"`
@@ -450,7 +359,8 @@ func (c Client) MakesByVehicleTypeName(ctx context.Context, name string) ([]Make
 		SearchCriteria string `json:"SearchCriteria"`
 		Results        []Make `json:"Results"`
 	}
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+
+	if err := c.doReq(ctx, uri, &result); err != nil {
 		return nil, err
 	}
 
@@ -458,17 +368,7 @@ func (c Client) MakesByVehicleTypeName(ctx context.Context, name string) ([]Make
 }
 
 func (c Client) VehicleTypesByMakeID(ctx context.Context, id int64) ([]VehicleType, error) {
-	url := endpoint + "/vehicles/GetVehicleTypesForMakeId/" + strconv.FormatInt(id, 10) + "?format=json"
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Add("content-type", "application/json")
-	resp, err := c.HTTPClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
+	uri := endpoint + "/vehicles/GetVehicleTypesForMakeId/" + strconv.FormatInt(id, 10) + "?format=json"
 
 	var result struct {
 		Count          int           `json:"Count"`
@@ -476,7 +376,8 @@ func (c Client) VehicleTypesByMakeID(ctx context.Context, id int64) ([]VehicleTy
 		SearchCriteria string        `json:"SearchCriteria"`
 		Results        []VehicleType `json:"Results"`
 	}
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+
+	if err := c.doReq(ctx, uri, &result); err != nil {
 		return nil, err
 	}
 
@@ -484,17 +385,7 @@ func (c Client) VehicleTypesByMakeID(ctx context.Context, id int64) ([]VehicleTy
 }
 
 func (c Client) VehicleTypesByMake(ctx context.Context, name string) ([]VehicleType, error) {
-	url := endpoint + "/vehicles/GetVehicleTypesForMake/" + name + "?format=json"
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Add("content-type", "application/json")
-	resp, err := c.HTTPClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
+	uri := endpoint + "/vehicles/GetVehicleTypesForMake/" + name + "?format=json"
 
 	var result struct {
 		Count          int           `json:"Count"`
@@ -502,7 +393,8 @@ func (c Client) VehicleTypesByMake(ctx context.Context, name string) ([]VehicleT
 		SearchCriteria string        `json:"SearchCriteria"`
 		Results        []VehicleType `json:"Results"`
 	}
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+
+	if err := c.doReq(ctx, uri, &result); err != nil {
 		return nil, err
 	}
 
@@ -510,17 +402,7 @@ func (c Client) VehicleTypesByMake(ctx context.Context, name string) ([]VehicleT
 }
 
 func (c Client) ModelsByMake(ctx context.Context, name string) ([]Model, error) {
-	url := endpoint + "/vehicles/getmodelsformake/" + name + "?format=json"
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Add("content-type", "application/json")
-	resp, err := c.HTTPClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
+	uri := endpoint + "/vehicles/getmodelsformake/" + name + "?format=json"
 
 	var result struct {
 		Count          int     `json:"Count"`
@@ -528,7 +410,8 @@ func (c Client) ModelsByMake(ctx context.Context, name string) ([]Model, error) 
 		SearchCriteria string  `json:"SearchCriteria"`
 		Results        []Model `json:"Results"`
 	}
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+
+	if err := c.doReq(ctx, uri, &result); err != nil {
 		return nil, err
 	}
 
@@ -536,17 +419,7 @@ func (c Client) ModelsByMake(ctx context.Context, name string) ([]Model, error) 
 }
 
 func (c Client) ModelsByMakeID(ctx context.Context, id int64) ([]Model, error) {
-	url := endpoint + "/vehicles/GetModelsForMakeId/" + strconv.FormatInt(id, 10) + "?format=json"
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Add("content-type", "application/json")
-	resp, err := c.HTTPClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
+	uri := endpoint + "/vehicles/GetModelsForMakeId/" + strconv.FormatInt(id, 10) + "?format=json"
 
 	var result struct {
 		Count          int     `json:"Count"`
@@ -554,7 +427,8 @@ func (c Client) ModelsByMakeID(ctx context.Context, id int64) ([]Model, error) {
 		SearchCriteria string  `json:"SearchCriteria"`
 		Results        []Model `json:"Results"`
 	}
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+
+	if err := c.doReq(ctx, uri, &result); err != nil {
 		return nil, err
 	}
 
@@ -562,17 +436,7 @@ func (c Client) ModelsByMakeID(ctx context.Context, id int64) ([]Model, error) {
 }
 
 func (c Client) ManufacturerDetailsByID(ctx context.Context, id int64) ([]Manufacturer, error) {
-	url := endpoint + "/vehicles/getmanufacturerdetails/" + strconv.FormatInt(id, 10) + "?format=json"
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Add("content-type", "application/json")
-	resp, err := c.HTTPClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
+	uri := endpoint + "/vehicles/getmanufacturerdetails/" + strconv.FormatInt(id, 10) + "?format=json"
 
 	var result struct {
 		Count          int            `json:"Count"`
@@ -580,7 +444,8 @@ func (c Client) ManufacturerDetailsByID(ctx context.Context, id int64) ([]Manufa
 		SearchCriteria string         `json:"SearchCriteria"`
 		Results        []Manufacturer `json:"Results"`
 	}
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+
+	if err := c.doReq(ctx, uri, &result); err != nil {
 		return nil, err
 	}
 
@@ -588,17 +453,7 @@ func (c Client) ManufacturerDetailsByID(ctx context.Context, id int64) ([]Manufa
 }
 
 func (c Client) ManufacturerDetailsByName(ctx context.Context, name string) ([]Manufacturer, error) {
-	url := endpoint + "/vehicles/getmanufacturerdetails/" + name + "?format=json"
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Add("content-type", "application/json")
-	resp, err := c.HTTPClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
+	uri := endpoint + "/vehicles/getmanufacturerdetails/" + name + "?format=json"
 
 	var result struct {
 		Count          int            `json:"Count"`
@@ -606,7 +461,8 @@ func (c Client) ManufacturerDetailsByName(ctx context.Context, name string) ([]M
 		SearchCriteria string         `json:"SearchCriteria"`
 		Results        []Manufacturer `json:"Results"`
 	}
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+
+	if err := c.doReq(ctx, uri, &result); err != nil {
 		return nil, err
 	}
 
@@ -614,17 +470,7 @@ func (c Client) ManufacturerDetailsByName(ctx context.Context, name string) ([]M
 }
 
 func (c Client) Makes(ctx context.Context) ([]Make, error) {
-	url := endpoint + "/vehicles/getallmakes?format=json"
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Add("content-type", "application/json")
-	resp, err := c.HTTPClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
+	uri := endpoint + "/vehicles/getallmakes?format=json"
 
 	var result struct {
 		Count          int    `json:"Count"`
@@ -632,7 +478,8 @@ func (c Client) Makes(ctx context.Context) ([]Make, error) {
 		SearchCriteria string `json:"SearchCriteria"`
 		Results        []Make `json:"Results"`
 	}
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+
+	if err := c.doReq(ctx, uri, &result); err != nil {
 		return nil, err
 	}
 
@@ -640,17 +487,7 @@ func (c Client) Makes(ctx context.Context) ([]Make, error) {
 }
 
 func (c Client) GetWMIList(ctx context.Context, manufacturer string) ([]WMI, error) {
-	url := endpoint + "/vehicles/GetWMIsForManufacturer/" + manufacturer + "?format=json"
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Add("content-type", "application/json")
-	resp, err := c.HTTPClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
+	uri := endpoint + "/vehicles/GetWMIsForManufacturer/" + manufacturer + "?format=json"
 
 	var result struct {
 		Count          int    `json:"Count"`
@@ -658,7 +495,8 @@ func (c Client) GetWMIList(ctx context.Context, manufacturer string) ([]WMI, err
 		SearchCriteria string `json:"SearchCriteria"`
 		Results        []WMI  `json:"Results"`
 	}
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+
+	if err := c.doReq(ctx, uri, &result); err != nil {
 		return nil, err
 	}
 
@@ -666,17 +504,7 @@ func (c Client) GetWMIList(ctx context.Context, manufacturer string) ([]WMI, err
 }
 
 func (c Client) DecodeWMI(ctx context.Context, wmi string) ([]DecodeWMIResult, error) {
-	url := endpoint + "/vehicles/decodewmi/" + wmi + "?format=json"
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Add("content-type", "application/json")
-	resp, err := c.HTTPClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
+	uri := endpoint + "/vehicles/decodewmi/" + wmi + "?format=json"
 
 	var result struct {
 		Count          int               `json:"Count"`
@@ -684,7 +512,8 @@ func (c Client) DecodeWMI(ctx context.Context, wmi string) ([]DecodeWMIResult, e
 		SearchCriteria string            `json:"SearchCriteria"`
 		Results        []DecodeWMIResult `json:"Results"`
 	}
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+
+	if err := c.doReq(ctx, uri, &result); err != nil {
 		return nil, err
 	}
 
@@ -692,17 +521,7 @@ func (c Client) DecodeWMI(ctx context.Context, wmi string) ([]DecodeWMIResult, e
 }
 
 func (c Client) VehicleVariablesList(ctx context.Context) ([]VehicleVariable, error) {
-	url := endpoint + "/vehicles/getvehiclevariablelist?format=json"
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Add("content-type", "application/json")
-	resp, err := c.HTTPClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
+	uri := endpoint + "/vehicles/getvehiclevariablelist?format=json"
 
 	var result struct {
 		Count          int               `json:"Count"`
@@ -710,7 +529,8 @@ func (c Client) VehicleVariablesList(ctx context.Context) ([]VehicleVariable, er
 		SearchCriteria string            `json:"SearchCriteria"`
 		Results        []VehicleVariable `json:"Results"`
 	}
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+
+	if err := c.doReq(ctx, uri, &result); err != nil {
 		return nil, err
 	}
 
@@ -718,17 +538,7 @@ func (c Client) VehicleVariablesList(ctx context.Context) ([]VehicleVariable, er
 }
 
 func (c Client) VehicleVariableValuesListByID(ctx context.Context, id int) ([]VehicleVariableValues, error) {
-	url := endpoint + "/vehicles/getvehiclevariablevalueslist/" + strconv.Itoa(id) + "?format=json"
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Add("content-type", "application/json")
-	resp, err := c.HTTPClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
+	uri := endpoint + "/vehicles/getvehiclevariablevalueslist/" + strconv.Itoa(id) + "?format=json"
 
 	var result struct {
 		Count          int                     `json:"Count"`
@@ -736,7 +546,8 @@ func (c Client) VehicleVariableValuesListByID(ctx context.Context, id int) ([]Ve
 		SearchCriteria string                  `json:"SearchCriteria"`
 		Results        []VehicleVariableValues `json:"Results"`
 	}
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+
+	if err := c.doReq(ctx, uri, &result); err != nil {
 		return nil, err
 	}
 
@@ -744,17 +555,7 @@ func (c Client) VehicleVariableValuesListByID(ctx context.Context, id int) ([]Ve
 }
 
 func (c Client) VehicleVariableValuesListByName(ctx context.Context, name string) ([]VehicleVariableValues, error) {
-	url := endpoint + "/vehicles/getvehiclevariablevalueslist/" + name + "?format=json"
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Add("content-type", "application/json")
-	resp, err := c.HTTPClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
+	uri := endpoint + "/vehicles/getvehiclevariablevalueslist/" + name + "?format=json"
 
 	var result struct {
 		Count          int                     `json:"Count"`
@@ -762,7 +563,8 @@ func (c Client) VehicleVariableValuesListByName(ctx context.Context, name string
 		SearchCriteria string                  `json:"SearchCriteria"`
 		Results        []VehicleVariableValues `json:"Results"`
 	}
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+
+	if err := c.doReq(ctx, uri, &result); err != nil {
 		return nil, err
 	}
 
@@ -770,22 +572,10 @@ func (c Client) VehicleVariableValuesListByName(ctx context.Context, name string
 }
 
 func (c Client) DecodeVINExtendedFlat(ctx context.Context, vin string, modelyear int) (map[string]string, error) {
-	url := endpoint + "/vehicles/DecodeVinValuesExtended/" + vin + "?format=json"
+	uri := endpoint + "/vehicles/DecodeVinValuesExtended/" + vin + "?format=json"
 	if modelyear != 0 {
-		url = url + "&modelyear=" + strconv.Itoa(modelyear)
+		uri = uri + "&modelyear=" + strconv.Itoa(modelyear)
 	}
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Add("content-type", "application/json")
-
-	resp, err := c.HTTPClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
 
 	var result struct {
 		Count          int                 `json:"Count"`
@@ -793,7 +583,8 @@ func (c Client) DecodeVINExtendedFlat(ctx context.Context, vin string, modelyear
 		SearchCriteria string              `json:"SearchCriteria"`
 		Results        []map[string]string `json:"Results"`
 	}
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+
+	if err := c.doReq(ctx, uri, &result); err != nil {
 		return nil, err
 	}
 
@@ -801,22 +592,10 @@ func (c Client) DecodeVINExtendedFlat(ctx context.Context, vin string, modelyear
 }
 
 func (c Client) DecodeVINExtended(ctx context.Context, vin string, modelyear int) ([]DecodeVINResult, error) {
-	url := endpoint + "/vehicles/DecodeVinExtended/" + vin + "?format=json"
+	uri := endpoint + "/vehicles/DecodeVinExtended/" + vin + "?format=json"
 	if modelyear != 0 {
-		url = url + "&modelyear=" + strconv.Itoa(modelyear)
+		uri = uri + "&modelyear=" + strconv.Itoa(modelyear)
 	}
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Add("content-type", "application/json")
-
-	resp, err := c.HTTPClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
 
 	var result struct {
 		Count          int               `json:"Count"`
@@ -824,7 +603,8 @@ func (c Client) DecodeVINExtended(ctx context.Context, vin string, modelyear int
 		SearchCriteria string            `json:"SearchCriteria"`
 		Results        []DecodeVINResult `json:"Results"`
 	}
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+
+	if err := c.doReq(ctx, uri, &result); err != nil {
 		return nil, err
 	}
 
@@ -832,22 +612,10 @@ func (c Client) DecodeVINExtended(ctx context.Context, vin string, modelyear int
 }
 
 func (c Client) DecodeVINFlat(ctx context.Context, vin string, modelyear int) (map[string]string, error) {
-	url := endpoint + "/vehicles/DecodeVinValues/" + vin + "?format=json"
+	uri := endpoint + "/vehicles/DecodeVinValues/" + vin + "?format=json"
 	if modelyear != 0 {
-		url = url + "&modelyear=" + strconv.Itoa(modelyear)
+		uri = uri + "&modelyear=" + strconv.Itoa(modelyear)
 	}
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Add("content-type", "application/json")
-
-	resp, err := c.HTTPClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
 
 	var result struct {
 		Count          int                 `json:"Count"`
@@ -855,7 +623,8 @@ func (c Client) DecodeVINFlat(ctx context.Context, vin string, modelyear int) (m
 		SearchCriteria string              `json:"SearchCriteria"`
 		Results        []map[string]string `json:"Results"`
 	}
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+
+	if err := c.doReq(ctx, uri, &result); err != nil {
 		return nil, err
 	}
 
@@ -863,22 +632,10 @@ func (c Client) DecodeVINFlat(ctx context.Context, vin string, modelyear int) (m
 }
 
 func (c Client) DecodeVIN(ctx context.Context, vin string, modelyear int) ([]DecodeVINResult, error) {
-	url := endpoint + "/vehicles/decodevin/" + vin + "?format=json"
+	uri := endpoint + "/vehicles/decodevin/" + vin + "?format=json"
 	if modelyear != 0 {
-		url = url + "&modelyear=" + strconv.Itoa(modelyear)
+		uri = uri + "&modelyear=" + strconv.Itoa(modelyear)
 	}
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Add("content-type", "application/json")
-
-	resp, err := c.HTTPClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
 
 	var result struct {
 		Count          int               `json:"Count"`
@@ -886,7 +643,8 @@ func (c Client) DecodeVIN(ctx context.Context, vin string, modelyear int) ([]Dec
 		SearchCriteria string            `json:"SearchCriteria"`
 		Results        []DecodeVINResult `json:"Results"`
 	}
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+
+	if err := c.doReq(ctx, uri, &result); err != nil {
 		return nil, err
 	}
 
